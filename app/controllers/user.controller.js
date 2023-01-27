@@ -2,9 +2,7 @@ const db = require("../models");
 const User = db.users;
 const Video = db.videos;
 
-// Create and Save a new Tutorial
 exports.create = (req, res) => {
-  // Validate request
   if (!req.body.email) {
     res.status(400).send({ message: "Content can not be empty!" });
     return;
@@ -14,7 +12,6 @@ exports.create = (req, res) => {
   const fName = req.body.firstName;
   const lName = req.body.lastName;
 
-  // Create a Tutorial
   const user = new User({
     profileImage: "https://api.multiavatar.com/" + random + ".svg",
     profileId: "@" + fName.toLowerCase() + lName.toLowerCase() + random,
@@ -24,7 +21,6 @@ exports.create = (req, res) => {
     password: req.body.password,
   });
 
-  // Save Tutorial in the database
   user
     .save(user)
     .then((data) => {
@@ -38,7 +34,6 @@ exports.create = (req, res) => {
     });
 };
 
-// Retrieve all Tutorials from the database.
 exports.findAll = (req, res) => {
   let condition = {};
 
@@ -53,14 +48,12 @@ exports.findAll = (req, res) => {
     });
 };
 
-// Find a single Tutorial with an id
 exports.findOne = (req, res) => {
   const email = req.params.email;
   let condition = { email: email };
 
   User.find(condition)
     .then((data) => {
-      console.log(data);
       if (Object.values(data).length === 0) {
         res
           .status(404)
@@ -76,16 +69,34 @@ exports.findOne = (req, res) => {
     });
 };
 
-// Update a Tutorial by the id in the request
-exports.update = (req, res) => {};
+exports.update = (req, res) => {
+  if (!req.body) {
+    return res.status(400).send({
+      message: "Data to update can not be empty!",
+    });
+  }
 
-// Delete a Tutorial with the specified id in the request
+  const id = req.params.id;
+
+  User.findByIdAndUpdate(id, req.body, { useFindAndModify: false })
+    .then((data) => {
+      if (!data) {
+        res.status(404).send({
+          message: `Cannot update User with id=${id}. Maybe User was not found!`,
+        });
+      } else res.send({ message: "User was updated successfully." });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: "Error updating User with id=" + id,
+      });
+    });
+};
+
 exports.delete = (req, res) => {};
 
-// Delete all Tutorials from the database.
 exports.deleteAll = (req, res) => {};
 
-// Find all published Tutorials
 exports.findAllPublished = (req, res) => {};
 
 exports.getVideos = (req, res) => {

@@ -9,6 +9,7 @@ module.exports = (mongoose) => {
         lastName: String,
         email: { type: String, unique: true, required: true },
         password: String,
+        subscriptions: [],
       },
       { timestamps: true }
     )
